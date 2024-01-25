@@ -1,14 +1,22 @@
 const db = require('./connection');
 
 async function getAllInfoModel() {
+  let conn;
+
   try {
-    const conn = await db.getConnection();
-    const rows = await conn.query('SELECT * FROM *');
-    conn.release();
+    conn = await db.getConnection();
+
+    if (!conn) {
+      throw new Error('Connection not established');
+    }
+
+    const [rows, fields] = await conn.query('SELECT * FROM *');
     return rows;
   } catch (err) {
-    console.error('Erro na consulta ao banco de dados:', err);
+    console.error('Error querying the database:', err);
     throw err;
+  } finally {
+    if (conn) conn.release();
   }
 }
 
